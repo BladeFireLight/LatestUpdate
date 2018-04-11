@@ -1,33 +1,29 @@
 language: generic
-
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      sudo: false
-      addons:
-        apt:
-          sources:
-            - sourceline: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod trusty main"
-              key_url: "https://packages.microsoft.com/keys/microsoft.asc"
-          packages:
-            - powershell
-#    - os: osx
-#      osx_image: xcode9.1
-#      before_install:
-#        - brew tap caskroom/cask
-#        - brew cask install powershell
+  - os: linux
+    dist: trusty
+    sudo: false
+    addons:
+      apt:
+        sources:
+        - sourceline: deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod
+            trusty main
+          key_url: https://packages.microsoft.com/keys/microsoft.asc
+        packages:
+        - powershell
   fast_finish: true
-
 install:
-  - pwsh -File "${TRAVIS_BUILD_DIR}/build/Install-Dependencies.ps1"
-  - pwsh -File "${TRAVIS_BUILD_DIR}/build/Initialize-Environment.ps1"
-
-before_script:
-#  - pwsh -File "${TRAVIS_BUILD_DIR}/tests/Build.ps1"
-
+- pwsh -File "${TRAVIS_BUILD_DIR}/build/Install-Dependencies.ps1"
+- pwsh -File "${TRAVIS_BUILD_DIR}/build/Initialize-Environment.ps1"
+before_script: 
 script:
-  - pwsh -File "${TRAVIS_BUILD_DIR}/tests/Main.Tests.ps1"
-
-after_success:
-#  - pwsh -File "${TRAVIS_BUILD_DIR}/deploy.ps1"
+- pwsh -File "${TRAVIS_BUILD_DIR}/tests/Main.Tests.ps1"
+after_success: 
+notifications:
+  email: false
+  pushover:
+    api_key:
+      secure: budN6AYbG2T7zho94bzXKd0LWZWaUpGrPO3JJQGWgOpG5CchFWQv/s5FQNe+IYesdD7w+jjNsnCs7lPqy5IZrMWS3x95FRZCd6TSOtrh6RiIUNr9PnflQWqPm518oePPXGliPy2XkIBnAa3ds+yHveJSuYuKM7vEe1SxlT95tFVdoHq+G+vAYq3Y4H0MgorkOOzd4K2HhoKQXzaMkeyQROO9rHJDfd9QfGJ1eVLW1K3GoCsfPeGYFffEcuwsVdt70gnMtKRC9oDxLE3VSlWNDkhNSKIIZEyeiC9yqZ3NGSQ+Pz0yA5d/wFxBcitsYymqDQVoeIX78ls0J/XQPWz3UrVb4pbc6keTXBsGog9OYhd870SFSVRVmtzbt/EbKwEQtCTenZ5kD0IW5StLoxemN8unoPzWDvtxZ7ZMQy8qA/f9Pb7BG/uFlIZ2YXip4dcgEutd8PWKpLxidFdtFdCHVg1oxlVnM58RTTXyWAeYvC00TzEybQ3QjzOvJUemP772FTWlx2E4QtdUkCtNb9ShJ74KdVx6/I+CnkAitCJyoC/8IKP1MS2kjoziAaS2F2MAqd+6AHA8lP9vxPrG23JL6Mw275I6V+T6RrjjPS8TnczRYp656dzSgIt6SgbiNvKzJkI36KrWQm48SmcI/IZCtT9b3OjiHwM+cmbH0eYrcIs=
+    users:
+      secure: DlkeAeWcuYuMbeMmu38szfeOTGaAFb42KcqHMA7NsJTE4A6rh9LGJXIHt+1DRw1bC1IQQYg0TS9sJHcVVKyZZSbLuqVz5Q9FyMeWz7dHgqXXOpUdNHqWJNvjil+DD9blqhJIN0iHi+JOxjVjmUru6zw0v3ctCTqJh84w2kjG76+Hkee1hzzqaglO+Otoqpdg74LcN7JZkjui7gvDLes0/TbXaU177thslPdWolW/3tdnZJeG0reFAPdDhLygFTq3Bhdug0zHGiUr0VtxdeeSvDo5YTXz/mit00M55tvp4P6Bg9zrqebMaKtwzzdng864EwwPMUimmd6RPhZszGAEpBDmsN+kCqcCj9AVI2hMPjc20+g5SmA4zlZ1/G3Uj9WvU9YinDCuzi9dme3APi9KvDEDfzgRO2jRtfbuM/+hQwd72Daq8i6NMUYeAJ6Qi543YoZTEc3HghUEKefUrfpyX9CIL88+WIvkDSgTPQwB8/xVvYIIJ1OhXULk/XjLKw972wLTQZBO7PQO8Sd6SojXl0Xi04IZe9pokejHht7OFkr23O9QZBWqupkVYsw+pHjq7JCl3n6e1tgFKv+2AaGHObKvpVDW/Jbwssq/m336WDtGNE2WGsR7lxI3b9lxyNPQDSKtVRxK6nR1GARyzupyIbd6li6TDvjN/g93nl3qxCU=
