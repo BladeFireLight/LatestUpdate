@@ -2,8 +2,8 @@ Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
 
 Write-Host -Object "`nInstalling package providers:" -ForegroundColor 'Yellow'
 $providerNames = 'NuGet', 'PowerShellGet'
-foreach ( $providerName in $providerNames ) {
-    if ( -not ( Get-PackageProvider $providerName -ErrorAction 'SilentlyContinue' ) ) {
+ForEach ( $providerName in $providerNames ) {
+    If ( -not ( Get-PackageProvider $providerName -ErrorAction 'SilentlyContinue' ) ) {
         Install-PackageProvider -Name $providerName -Scope 'CurrentUser' -Force -ForceBootstrap
     }
 }
@@ -14,16 +14,15 @@ Get-PackageProvider -Name $providerNames |
 
 Write-Host -Object "Installing modules:" -ForegroundColor 'Yellow'
 $moduleNames = 'Pester', 'Coveralls', 'PSScriptAnalyzer'
-foreach ( $moduleName in $moduleNames ) {
-    if ( $env:APPVEYOR_BUILD_WORKER_IMAGE -eq 'WMF 5' ) {
+ForEach ( $moduleName in $moduleNames ) {
+    If ( $env:APPVEYOR_BUILD_WORKER_IMAGE -eq 'WMF 5' ) {
         Install-Module -Name $moduleName -Scope 'CurrentUser' -Repository 'PSGallery' -Force -Confirm:$false |
             Out-Null
     }
-    else {
+    Else {
         Install-Module -Name $moduleName -Scope 'CurrentUser' -Repository 'PSGallery' -SkipPublisherCheck -Force -Confirm:$false |
             Out-Null
     }
-    
     Import-Module -Name $moduleName
 }
 Remove-Variable -Name 'moduleName'

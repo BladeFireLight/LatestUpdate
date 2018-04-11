@@ -33,7 +33,7 @@ $text = @{
     'RstLinkForm'           = '`{0}`_'
     'RstImageForm'          = ".. image:: {0}`r`n   :target: {1}`r`n   :alt: {2}`r`n`r`n"
     'RstLinkMap'            = ".. _{0}: {1}`r`n`r`n"
-    'Title'                 = 'Armor PowerShell Module'
+    'Title'                 = 'LatestUpdate'
     'TotalDownloads'        = 'Total Downloads'
     'TravisCi'              = 'Travis CI'
     'TravisCiImageUrl'      = "https://travis-ci.org/${env:CI_OWNER_NAME}/${env:CI_PROJECT_NAME}.svg?branch=master"
@@ -116,14 +116,17 @@ Write-Host -Object "`nUpdate the module manifest." -ForegroundColor 'Yellow'
 $year = ( Get-Date ).Year
 
 $description = (
-    'This is a community project that provides a powerful command-line interface for managing and monitoring ' +
-    "your $( $text.ArmorComplete ) (secure public cloud) and $( $text.ArmorAnywhere ) (security as a service) " +
-    'environments & accounts via a PowerShell module with cmdlets that interact with the published ' +
-    "$( $text.RestfulApi ).`r`n`r`nEvery code push is built on $( $text.Windows ) via $( $text.AppVeyor ), as " +
-    "well as on $( $text.macOS ) and $( $text.Ubuntu ) via $( $text.TravisCi ), and tested using the " +
-    "$( $text.Pester ) test & mock framework.`r`n`r`nCode coverage scores and reports showing how much of the " +
-    "project is covered by automated tests are tracked by $( $text.Coveralls ).`r`n`r`nEvery successful " +
-    "build is published on the $( $text.PSGallery )."
+    'A module for retrieving the latest Windows 10 / 8.1 / 7 (and Windows Server) Cumulative or Monthly Rollup ' +
+    'updates from the Microsoft Update History page, downloading the update file locally and importing into a ' +
+    'Microsoft Deployment Toolkit deployment share. Importing the updates into an MDT share speeds the installation ' +
+    'and patching of Windows 10. ' +
+    '`r`n`r`n' +
+    'Get-LatestUpdate supports querying for Windows builds and processor architecture for downloading updates to ' +
+    'suit your specific environment.' +
+    '`r`n`r`n' +
+    'Get-LatestUpdate and Save-LatestUpdate support PowerShell Core; however, Import-LatestUpdate requires the ' +
+    'Microsoft Deployment Toolkit, so requires Windows PowerShell until Microsoft updates the MDT PowerShell module ' +
+    'to support PowerShell Core.'
 )
 
 $functionsToExport = ( Get-ChildItem -Path "${env:CI_MODULE_PATH}/Public" ).BaseName
@@ -135,24 +138,23 @@ $scriptsToProcess = Get-ChildItem -Path "${env:CI_MODULE_PATH}/Lib" -File |
     Resolve-Path -Relative
 
 $splat = @{
-<#    'Path'                  = $env:CI_MODULE_MANIFEST_PATH
+    'Path'                  = $env:CI_MODULE_MANIFEST_PATH
     'RootModule'            = "${env:CI_MODULE_NAME}.psm1"
     'ModuleVersion'         = $env:CI_MODULE_VERSION
-    'Guid'                  = '226c1ea9-1078-402a-861c-10a845a0d173'
-    'Author'                = 'Troy Lindsay'
-    'CompanyName'           = 'Armor'
-    'Copyright'             = "(c) 2017-${year} Troy Lindsay. All rights reserved."
+    'Guid'                  = '1a3f9720-247a-4a25-8120-a164b35856ef'
+    'Author'                = 'Aaron Parker'
+    'CompanyName'           = 'stealthpuppy'
+    'Copyright'             = "(c) 2018-${year} Aaron Parker. All rights reserved."
     'Description'           = $description
     'PowerShellVersion'     = '5.0'
     'ProcessorArchitecture' = 'None'
     'ScriptsToProcess'      = $scriptsToProcess
     'FunctionsToExport'     = $functionsToExport
     'FileList'              = $fileList
-    'Tags'                  = 'Armor', 'Defense', 'Cloud', 'Security', 'DevOps', 'Scripting', 'Automation',
-        'Performance', 'Complete', 'Anywhere', 'Compliant', 'PCI-DSS', 'HIPAA', 'HITRUST', 'GDPR', 'IaaS', 'SaaS'
+    'Tags'                  = 'Get-LatestUpdate', 'Import-LatestUpdate', 'Save-LatestUpdate'
     'LicenseUri'            = "$( $text.RepoUrl )/blob/master/LICENSE.txt"
     'IconUri'               = 'http://i.imgur.com/fbXjkCn.png'
-    'ErrorAction'           = 'Stop' #>
+    'ErrorAction'           = 'Stop'
 }
 
 Update-ModuleManifest @splat
@@ -171,123 +173,3 @@ Write-Host -Object "`nRestored the working directory to: '${location}'." -Foregr
 
 Write-Host -Object "`nImport module: '${env:CI_MODULE_NAME}'." -ForegroundColor 'Yellow'
 Import-Module -Name $env:CI_MODULE_MANIFEST_PATH -Force
-
-# Update the docs
-Write-Host -Object "`nBuilding the documentation." -ForegroundColor 'Yellow'
-
-# Enrich keywords in the description for use in README.md (Markdown formatting)
-$markDownDescription = $description -replace
-<#    $text.ArmorComplete, $text.ArmorCompleteMd -replace
-    $text.ArmorAnywhere, $text.ArmorAnywhereMd -replace #>
-    $text.RestfulApi, $text.RestfulApiMd -replace
-    $text.Windows, $text.WindowsBold -replace
-    $text.AppVeyor, $text.AppVeyorMd -replace
-    $text.macOS, $text.macOSBold -replace
-    $text.Ubuntu, $text.UbuntuBold -replace
-    $text.TravisCi, $text.TravisCiMd -replace
-    $text.Pester, $text.PesterMd -replace
-    $text.Coveralls, $text.CoverallsMd -replace
-    $text.PSGallery, $text.PSGalleryMd
-
-# Build README.md
-$content = (
-    "# $( $text.Title )`r`n`r`n" +
-    $text.PSGalleryMdShield + $text.PSDownloadsMdShield + "`r`n" +
-    $text.AppVeyorMdShield + $text.TravisCiMdShield + $text.CoverallsMdShield + $text.ReadTheDocsMdShield +
-    "`r`n`r`n${markDownDescription}`r`n`r`n" +
-    "Please visit the $( $text.ReadTheDocsMd ) for more details."
-) |
-    Out-File -FilePath "${env:CI_BUILD_PATH}/README.md" -Encoding 'utf8'
-
-# Enrich keywords in the description for use in index.rst (reStructuredText formatting)
-$reStructuredTextDescription = $description -replace
-<#    $text.ArmorComplete, $text.ArmorCompleteRst -replace
-    $text.ArmorAnywhere, $text.ArmorAnywhereRst -replace #>
-    $text.RestfulApi, $text.RestfulApiRst -replace
-    $text.Windows, $text.WindowsBold -replace
-    $text.AppVeyor, $text.AppVeyorRst -replace
-    $text.macOS, $text.macOSBold -replace
-    $text.Ubuntu, $text.UbuntuBold -replace
-    $text.TravisCi, $text.TravisCiRst -replace
-    $text.Pester, $text.PesterRst -replace
-    $text.Coveralls, $text.CoverallsRst -replace
-    $text.PSGallery, $text.PSGalleryRst
-
-$content = @()
-$content += (
-    "$( $text.Title )`r`n" +
-    "========================`r`n`r`n" +
-    $text.PSGalleryRstShield + $text.PSDownloadsRstShield + "`r`n" +
-    $text.AppVeyorRstShield + $text.TravisCiRstShield + $text.CoverallsRstShield + $text.ReadTheDocsRstShield +
-    $reStructuredTextDescription +
-    "`r`n`r`nThe source code is $( $text.GitHubRst ). `r`n`r`n" + 
-<#    $text.ArmorCompleteRstMap +
-    $text.ArmorAnywhereRstMap + #>
-    $text.RestfulApiRstMap +
-    $text.AppVeyorRstMap +
-    $text.TravisCiRstMap +
-    $text.PesterRstMap +
-    $text.CoverallsRstMap +
-    $text.PSGalleryRstMap +
-    $text.GitHubRstMap +
-    ".. toctree::`r`n" +
-    "   :maxdepth: 2`r`n" +
-    "   :hidden:`r`n" +
-    "   :caption: User Documentation`r`n"
-)
-
-$fileNames = ( Get-ChildItem -Path './docs' ).Where( { $_.Name -match '^usr_\d\d_.*.rst$' } ).ForEach( { $_.Name.ToLower() } )
-foreach ( $fileName in $fileNames ) {
-    $content += "   ${fileName}"
-}
-
-$content += (
-    "`r`n`r`n.. toctree::`r`n" +
-    "   :maxdepth: 2`r`n" +
-    "   :hidden:`r`n" +
-    "   :caption: Command Documentation`r`n" +
-    "   "
-)
-
-# Build the command documentation menu
-$verbs = ( Get-Command -Module $env:CI_MODULE_NAME ).Verb.ForEach( { $_.ToLower() } ) |
-    Select-Object -Unique
-foreach ( $verb in $verbs ) {
-    $content += "   cmd_${verb}"
-}
-
-$content += ''
-
-# Write the index file
-$content |
-    Out-File -FilePath "${env:CI_BUILD_PATH}/docs/index.rst" -Encoding 'utf8'
-
-Write-Host -Object "`tindex"
-
-# Build the command documentation files for each verb
-$verbs = ( Get-Command -Module $env:CI_MODULE_NAME ).Verb |
-    Select-Object -Unique
-foreach ( $verb in $verbs ) {
-    $content = @()
-    $content += "${verb} Commands"
-    $content += '========================='
-    $content += "This page contains details on **${verb}** commands."
-    $content += ''
-
-    # Build the command documentation from the comment-based help
-    $commands = ( Get-Command -Module $env:CI_MODULE_NAME ).Where( { $_.Verb -eq $verb } )
-    foreach ( $command in $commands ) {
-        $content += $command.Name
-        $content += '-------------------------'
-        $content += Get-Help -Name $command.name -Detailed
-        $content += ''
-    }
-
-    $verb = $verb.ToLower()
-    $content |
-        Out-File -FilePath "${env:CI_BUILD_PATH}/docs/cmd_${verb}.rst" -Encoding 'utf8'
-
-    Write-Host -Object "`tcmd_${verb}"
-}
-
-Write-Host -Object ''
