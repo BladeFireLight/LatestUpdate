@@ -1,11 +1,11 @@
 # LatestUpdate
 
-[![Build status][appveyor-badge]][appveyor-build]
+[![AppVeyor][appveyor-badge]][appveyor-build]
+[![Travis][travis-badge]][travis]
 [![GitHub Release][github-release-badge]][github-release]
 [![PowerShell Gallery][psgallery-badge]][psgallery]
 [![PowerShell Gallery Version][psgallery-version-badge]][psgallery]
 [![License][license-badge]][license]
-[![Travis][travis-badge]][travis]
 
 ## About
 
